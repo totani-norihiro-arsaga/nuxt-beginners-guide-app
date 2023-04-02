@@ -1,6 +1,7 @@
 import User from "~/types/user"
 import {publishPostParams} from "~/types/param";
 import {Post, UserPost} from "~/types/post";
+import {inputToRGB} from "@ctrl/tinycolor";
 
 export const posts = () => {
     const posts = useState<Post[]>(() => {
@@ -37,7 +38,8 @@ export const posts = () => {
     };
     const fetchAll = async () => {
         clearPost();
-        const {data} = await useFetch<{ [key: string]: { body: string; createdAt: number; title: string; user: object } }>('https://nuxt-beginners-guide-app-default-rtdb.firebaseio.com/posts.json');
+        const {data} = await useFetch<{ [key: string]: { body: string; createdAt: number; title: string; user: object } }>
+                                     ('https://nuxt-beginners-guide-app-default-rtdb.firebaseio.com/posts.json');
         if (data.value !== null) {
             const posts: Post[] = Object.entries(data.value).map((post) => {
                 return {...post[1], id: post[0]} as Post;
@@ -45,10 +47,21 @@ export const posts = () => {
             setPost(posts);
         }
     }
+    const getById = async (id: string) => {
+        clearPost();
+        const{data} = await useFetch<{ body: string; createdAt: number; title: string; user: User }>
+        (`https://nuxt-beginners-guide-app-default-rtdb.firebaseio.com/posts/${id}.json`);
+        if(data.value !== null) {
+            posts.value.push({...data.value, id: id});
+        } else {
+            return;
+        }
+    }
     return {
         get: readonly(posts),
         setPost: setPost,
         publishPost: publishPost,
         fetchAll: fetchAll,
+        getById: getById,
     };
 };

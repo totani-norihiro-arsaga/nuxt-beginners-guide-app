@@ -4,7 +4,7 @@
       <div class="clearfix" slot="header">
         <span>新規投稿</span>
       </div>
-      <el-table :data="showPosts" style="width: 100%" class="table">
+      <el-table :data="showPosts" style="width: 100%" class="table" @row-click="handleClick">
         <el-table-column prop="title" label="タイトル"></el-table-column>
         <el-table-column
           prop="user.id"
@@ -21,11 +21,16 @@
   </section>
 </template>
 <script setup lang="ts">
+import {Post} from "~/types/post";
 const Posts = posts();
 await Posts.fetchAll();
 const showPosts = computed(() => {
   return Posts.get.value;
 });
+const handleClick = (post: Post) => {
+  console.log('ハンドルクリック',post);
+  navigateTo(`/posts/details/${post.id}`);
+}
 </script>
 <style>
 .posts-page .el-table__row {
